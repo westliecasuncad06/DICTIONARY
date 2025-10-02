@@ -1,5 +1,9 @@
-- [x] Add down arrow button HTML next to the search button in admin.php
-- [x] Add CSS styling for the arrow button and active suggestion highlight
-- [x] Add JavaScript variable for selectedIndex and event listener for arrow button click
-- [x] Modify input event to reset selectedIndex and remove active classes
-- [x] Modify suggestion click event to reset selectedIndex and remove active classes
+# TODO for Adding Database for Admin and User with MD5 Passwords
+
+- [x] Create users.sql with users table schema and default admin/user inserts
+- [x] Create setup_users.php to execute users.sql and delete itself
+- [x] Modify index.php to use MD5 for password verification
+- [x] Modify register.php to use MD5 for password hashing
+- [x] Modify db.php to remove users table creation
+- [ ] Run setup_users.php to apply database changes
+- [ ] Test login with admin and user credentials

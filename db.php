@@ -43,18 +43,7 @@ if ($conn->query($sql) === TRUE) {
     echo "Error creating table: " . $conn->error . "<br>";
 }
 
-$sql = "CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)";
-if ($conn->query($sql) === TRUE) {
-    echo "Table 'users' created successfully<br>";
-} else {
-    echo "Error creating table: " . $conn->error . "<br>";
-}
+
 
 // Import data from oedict.sql, parsing meaning into wordtype and definition
 $oedict_sql = file_get_contents('oedict.sql');

@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (empty($errors)) {
         // Check if username or email exists
-        $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
+        $stmt = $conn->prepare("SELECT id FROM user WHERE username = ? OR email = ?");
         $stmt->bind_param("ss", $user, $email);
         $stmt->execute();
         $stmt->store_result();
@@ -37,8 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errors[] = "Username or email already exists.";
         } else {
             // Hash password and insert
-            $hash = password_hash($pass, PASSWORD_DEFAULT);
-            $stmt = $conn->prepare("INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)");
+            $hash = md5($pass);
+            $stmt = $conn->prepare("INSERT INTO user (username, email, password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $user, $email, $hash);
             if ($stmt->execute()) {
                 $success = "Registration successful! <a href='login.php'>Login here</a>";
