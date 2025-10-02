@@ -27,14 +27,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_word'])) {
 
 // Handle edit word
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_word'])) {
-    $id = intval($_POST['id']);
-    $word = $conn->real_escape_string($_POST['word']);
+    $word = $conn->real_escape_string($_POST['id']);
     $wordtype = $conn->real_escape_string($_POST['wordtype']);
     $definition = $conn->real_escape_string($_POST['definition']);
     $synonyms = $conn->real_escape_string($_POST['synonyms']);
     $antonyms = $conn->real_escape_string($_POST['antonyms']);
 
-    $sql = "UPDATE english SET word='$word', wordtype='$wordtype', definition='$definition', synonyms='$synonyms', antonyms='$antonyms' WHERE id=$id";
+    $sql = "UPDATE english SET word='$word', wordtype='$wordtype', definition='$definition', synonyms='$synonyms', antonyms='$antonyms' WHERE word='$word'";
     $conn->query($sql);
     header("Location: admin.php");
     exit();
@@ -42,8 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_word'])) {
 
 // Handle delete word
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_word'])) {
-    $id = intval($_POST['id']);
-    $sql = "DELETE FROM english WHERE id=$id";
+    $word = $conn->real_escape_string($_POST['id']);
+    $sql = "DELETE FROM english WHERE word='$word'";
     $conn->query($sql);
     header("Location: admin.php");
     exit();
@@ -331,6 +330,10 @@ $conn->close();
             background: #3396D3 !important;
             color: white !important;
         }
+        .dropdown-item.active {
+            background: #3396D3 !important;
+            color: white !important;
+        }
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.5rem;
@@ -392,6 +395,9 @@ $conn->close();
             <form method="POST" class="search-form" id="searchForm">
                 <input type="text" class="search-input" name="keyword" id="keyword" placeholder="Search for a word..." value="<?php echo isset($_POST['keyword']) ? htmlspecialchars($_POST['keyword']) : ''; ?>" required>
                 <div id="suggestions" class="dropdown-menu w-100" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: white; border: 1px solid #ddd; border-radius: 0 0 10px 10px; max-height: 200px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1);"></div>
+                <button type="button" id="arrowDownBtn" class="search-btn" title="Select next suggestion" style="right: 80px;">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
                 <button type="submit" class="search-btn">
                     <i class="fas fa-search"></i> Search
                 </button>
@@ -415,7 +421,7 @@ $conn->close();
             // Handle search
             if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['keyword'])) {
                 $keyword = $conn->real_escape_string($_POST['keyword']);
-                $sql = "SELECT word, wordtype, definition, synonyms, antonyms FROM english WHERE word = '$keyword' ORDER BY word LIMIT 50";
+$sql = "SELECT word, wordtype, definition, synonyms, antonyms FROM english WHERE word = '$keyword' ORDER BY word LIMIT 50";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -485,8 +491,28 @@ $conn->close();
             // Autocomplete suggestions
             const keywordInput = document.getElementById('keyword');
             const suggestionsDiv = document.getElementById('suggestions');
+            const arrowDownBtn = document.getElementById('arrowDownBtn');
+            let selectedIndex = -1;
+
+            function clearActiveSuggestion() {
+                const items = suggestionsDiv.querySelectorAll('.dropdown-item.active');
+                items.forEach(item => item.classList.remove('active'));
+            }
+
+            function selectSuggestion(index) {
+                const items = suggestionsDiv.querySelectorAll('.dropdown-item');
+                if (items.length === 0) return;
+                if (index < 0) index = items.length - 1;
+                if (index >= items.length) index = 0;
+                clearActiveSuggestion();
+                items[index].classList.add('active');
+                keywordInput.value = items[index].textContent;
+                selectedIndex = index;
+                items[index].scrollIntoView({ block: 'nearest' });
+            }
 
             keywordInput.addEventListener('input', function() {
+                selectedIndex = -1;
                 const query = this.value.trim();
                 if (query.length > 0) {
                     fetch(`suggestions.php?q=${encodeURIComponent(query)}`)
@@ -503,6 +529,8 @@ $conn->close();
                                         e.preventDefault();
                                         keywordInput.value = word;
                                         suggestionsDiv.style.display = 'none';
+                                        selectedIndex = -1;
+                                        clearActiveSuggestion();
                                     });
                                     suggestionsDiv.appendChild(item);
                                 });
@@ -520,10 +548,33 @@ $conn->close();
                 }
             });
 
+            keywordInput.addEventListener('keydown', function(event) {
+                const items = suggestionsDiv.querySelectorAll('.dropdown-item');
+                if (items.length === 0) return;
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    selectedIndex = (selectedIndex + 1) % items.length;
+                    selectSuggestion(selectedIndex);
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    selectedIndex--;
+                    if (selectedIndex < 0) selectedIndex = items.length - 1;
+                    selectSuggestion(selectedIndex);
+                } else if (event.key === 'Enter' && selectedIndex >= 0) {
+                    event.preventDefault();
+                    keywordInput.value = items[selectedIndex].textContent;
+                    suggestionsDiv.style.display = 'none';
+                    selectedIndex = -1;
+                    clearActiveSuggestion();
+                }
+            });
+
             // Hide suggestions when clicking outside
             document.addEventListener('click', function(e) {
                 if (!keywordInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
                     suggestionsDiv.style.display = 'none';
+                    selectedIndex = -1;
+                    clearActiveSuggestion();
                 }
             });
 
@@ -557,6 +608,15 @@ $conn->close();
                 const modal = this;
                 modal.querySelector('#delete_id').value = id;
                 modal.querySelector('#delete_word_text').textContent = word;
+            });
+            arrowDownBtn.addEventListener('click', function() {
+                const items = suggestionsDiv.querySelectorAll('.dropdown-item');
+                if (items.length === 0) return;
+                selectedIndex++;
+                if (selectedIndex >= items.length) {
+                    selectedIndex = 0;
+                }
+                selectSuggestion(selectedIndex);
             });
         });
     </script>

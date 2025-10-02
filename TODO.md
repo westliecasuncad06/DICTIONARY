@@ -1,0 +1,5 @@
+- [x] Add down arrow button HTML next to the search button in admin.php
+- [x] Add CSS styling for the arrow button and active suggestion highlight
+- [x] Add JavaScript variable for selectedIndex and event listener for arrow button click
+- [x] Modify input event to reset selectedIndex and remove active classes
+- [x] Modify suggestion click event to reset selectedIndex and remove active classes
