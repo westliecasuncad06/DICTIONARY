@@ -303,12 +303,15 @@ $conn->close();
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <h1><i class="fas fa-book"></i> Dictionary</h1>
-            <p>Search for words and their meanings</p>
-        </div>
-    </header>
+        <header class="header">
+            <div class="container">
+                <h1><i class="fas fa-book"></i> Dictionary</h1>
+                <p>Search for words and their meanings</p>
+                <div class="d-flex justify-content-end">
+                    <a href="logout.php" class="btn btn-outline-primary"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </header>
 
     <main class="container">
         <section class="search-section">

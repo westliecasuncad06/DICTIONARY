@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt = $conn->prepare("INSERT INTO user (username, email, password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $user, $email, $hash);
             if ($stmt->execute()) {
-                $success = "Registration successful! <a href='login.php'>Login here</a>";
+                $success = "Registration successful! <a href='index.php'>Login here</a>";
             } else {
                 $errors[] = "Registration failed.";
             }
@@ -143,7 +143,7 @@ $conn->close();
             <button type="submit" class="btn btn-register">Register</button>
         </form>
         <div class="login-link">
-            <p>Already have an account? <a href="login.php">Login</a></p>
+            <p>Already have an account? <a href="index.php">Login</a></p>
         </div>
     </div>
 </body>

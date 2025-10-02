@@ -392,7 +392,10 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
             <div class="container">
                 <h1><i class="fas fa-cog"></i> Admin Dictionary</h1>
                 <p>Manage words in the dictionary</p>
-                <button class="btn add-word-btn" data-bs-toggle="modal" data-bs-target="#addWordModal"><i class="fas fa-plus"></i> Add New Word</button>
+                <div class="d-flex justify-content-between align-items-center">
+                    <button class="btn add-word-btn" data-bs-toggle="modal" data-bs-target="#addWordModal"><i class="fas fa-plus"></i> Add New Word</button>
+                    <a href="logout.php" class="btn btn-outline-light"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
             </div>
         </header>
 
