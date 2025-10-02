@@ -17,6 +17,17 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Get user name from database
+$user_username = $_SESSION['username'];
+$sql = "SELECT username FROM user WHERE username = '$user_username'";
+$result = $conn->query($sql);
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $display_name = $row['username'];
+} else {
+    $display_name = 'Unknown';
+}
+
 $conn->close();
 ?>
 
@@ -307,9 +318,10 @@ $conn->close();
             <div class="container">
                 <h1><i class="fas fa-book"></i> Dictionary</h1>
                 <p>Search for words and their meanings</p>
-                <div class="d-flex justify-content-end">
-                    <a href="logout.php" class="btn btn-outline-primary"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
+<div class="d-flex justify-content-end align-items-center" style="position: absolute; top: 20px; right: 20px;">
+    <span class="me-3">Welcome, <?php echo htmlspecialchars($display_name); ?></span>
+    <a href="logout.php" class="btn btn-outline-light"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
             </div>
         </header>
 
